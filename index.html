@@ -927,8 +927,15 @@ window.FP.zayed = {
     }catch(e){}
   }
   try{ if ('speechSynthesis' in window){ pickVoice(); window.speechSynthesis.onvoiceschanged = pickVoice; } }catch(e){}
+  /* Words the browser voice says wrongly when read on their own.
+     "content" (happy) gets read like the verb "ils content" (sounds "kont").
+     Spelling it "contant" makes the voice say it correctly: "kon-TON". */
+  var PRONOUNCE = { 'content':'contant', 'Content':'Contant' };
+  function fixPronunciation(text){
+    return String(text).replace(/[A-Za-zÀ-ÿœŒ]+/g, function(w){ return PRONOUNCE.hasOwnProperty(w) ? PRONOUNCE[w] : w; });
+  }
   function makeUtter(text){
-    var u = new SpeechSynthesisUtterance(text);
+    var u = new SpeechSynthesisUtterance(fixPronunciation(text));
     u.lang = 'fr-FR'; if (frVoice) u.voice = frVoice;
     u.rate = SETTINGS.slow ? 0.6 : 0.85;
     return u;
